@@ -238,6 +238,8 @@ Blog_Admin_updateArticle:
     handler: ${Conf.handler}
     runtime: ${Conf.runtime}
     region:  ${Conf.region}
+    memorySize: 512
+    timeout: 100
     include:
       - ${Conf.include_common}
     environment:
