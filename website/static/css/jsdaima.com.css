@@ -1,0 +1,59 @@
+* {
+    font-family: 'Microsoft Yahei';
+    margin: 0;
+    padding: 0;
+}
+
+.fl {
+    float: left;
+}
+
+.fr {
+    float: right;
+}
+
+.wrapper {
+    width: 100%;
+    height: 125px;
+    margin-top: 20px;
+}
+
+.wrapper p {
+    padding-top: 0px;
+    line-height: 27px;
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+}
+
+.tagcloud {
+    position: absolute;
+    margin-left: -10px;
+}
+
+.tagcloud a {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    padding: 5px 10px;
+    color: #333;
+    font-size: 16px;
+    border: 1px solid #e6e7e8;
+    border-radius: 18px;
+    background-color: #f2f4f8;
+    text-decoration: none;
+    white-space: nowrap;
+    -o-box-shadow: 6px 4px 8px 0 rgba(151, 142, 136, .34);
+    -ms-box-shadow: 6px 4px 8px 0 rgba(151, 142, 136, .34);
+    -moz-box-shadow: 6px 4px 8px 0 rgba(151, 142, 136, .34);
+    -webkit-box-shadow: 6px 4px 8px 0 rgba(151, 142, 136, .34);
+    box-shadow: 6px 4px 8px 0 rgba(151, 142, 136, .34);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4,Direction=135, Color='#000000')"; /*兼容ie7/8*/
+    filter: progid:DXImageTransform.Microsoft.Shadow(color='#969696', Direction=125, Strength=9);
+    /*strength是阴影大小，direction是阴影方位，单位为度，可以为负数，color是阴影颜色 （尽量使用数字）使用IE滤镜实现盒子阴影的盒子必须是行元素或以行元素显示（block或inline-block;）*/
+}
+
+.tagcloud a:hover {
+    color: #3385cf;
+}

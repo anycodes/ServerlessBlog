@@ -1,0 +1,6 @@
+{% extends 'admin/model/edit.html' %} <!-- 声明继承 Flask-Admin 的模型编辑模板 -->
+
+{% block tail %} <!-- 向父模板的 tail 块内追加内容 -->
+{{ super() }}
+{{ ckeditor.load() }} <!-- 加载 CKEditor 的 JavaScript 文件，默认从 CDN 获取 -->
+{% endblock %}

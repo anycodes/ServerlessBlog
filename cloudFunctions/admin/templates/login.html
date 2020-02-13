@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        var url = window.location.href
+        url = url.split("admin")[0] + "admin"
+        String.prototype.endWith = function (s) {
+            var d = this.length - s.length;
+            return (d >= 0 && this.lastIndexOf(s) == d)
+        }
+        if (window.location.href != url) {
+            if (!window.location.href.endsWith("admin") || !window.location.href.endsWith("admin/"))
+                window.location = url
+        }
+
+        function doLogin() {
+            var xmlhttp = window.XMLHttpRequest ? (new XMLHttpRequest()) : (new ActiveXObject("Microsoft.XMLHTTP"))
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    if (JSON.parse(xmlhttp.responseText)["token"]) {
+                        document.cookie = "token=" + JSON.parse(xmlhttp.responseText)["token"];
+                        window.location = `http://${window.location.host}/admin`
+                    } else {
+                        alert(JSON.parse(xmlhttp.responseText)["message"])
+                    }
+                }
+            }
+            xmlhttp.open("POST", window.location.pathname, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.send(JSON.stringify({
+                "username": document.getElementById("username").value,
+                "password": document.getElementById("password").value,
+            }));
+        }
+    </script>
+</head>
+<body>
+
+<center><h1>Serverless Blog 后台管理</h1>
+    管理账号：<input type="text" id="username"><br>
+    管理密码：<input type="password" id="password"><br>
+    <input type="reset"><input type="submit" onclick="doLogin()"><br>
+</center>
+</body>
+</html>

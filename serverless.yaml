@@ -1,0 +1,321 @@
+# 函数们的整体配置信息
+Conf:
+  component: "serverless-global"
+  inputs:
+    region: ap-shanghai
+    runtime: Python3.6
+    handler: index.main_handler
+    include_common: ./common
+    blog_user: Dfounder
+    blog_email: service@anycodes.cngit
+    blog_about_me: 这就是我的博客
+    blog_host: blog.0duzhan.com
+    website_title: Serverless Blog System
+    website_keywords: Serverless, Serverless Framework, Tencent Cloud, SCF
+    website_description: 一款基于腾讯云Serverless架构，并且采用Serverless Framework构建的Serverless博客系统。
+    website_bucket:
+    mysql_host:
+    mysql_user:
+    mysql_password:
+    mysql_port:
+    mysql_db:
+    admin_user:
+    admin_password:
+    tencent_secret_id:
+    tencent_secret_key:
+    tencent_appid:
+
+
+# 网站
+CosBucket:
+  component: '@serverless/tencent-website'
+  inputs:
+    code:
+      root: website
+      src: dist
+      index: list.html
+    region:  ${Conf.region}
+    bucketName: ${Conf.website_bucket}
+
+# 各个函数的单独配置
+Blog_Web_addComment:
+  component: "@serverless/tencent-scf"
+  inputs:
+    name: Blog_Web_addComment
+    description: 添加评论
+    codeUri: ./cloudFunctions/addComment
+    handler: ${Conf.handler}
+    runtime: ${Conf.runtime}
+    region:  ${Conf.region}
+    include:
+      - ${Conf.include_common}
+    environment:
+      variables:
+        mysql_host: ${Conf.mysql_host}
+        mysql_port: ${Conf.mysql_port}
+        mysql_user: ${Conf.mysql_user}
+        mysql_password: ${Conf.mysql_password}
+        mysql_db: ${Conf.mysql_db}
+
+Blog_Web_getArticleContent:
+  component: "@serverless/tencent-scf"
+  inputs:
+    name: Blog_Web_getArticleContent
+    description: 获取文章内容
+    codeUri: ./cloudFunctions/getArticleContent
+    handler: ${Conf.handler}
+    runtime: ${Conf.runtime}
+    region:  ${Conf.region}
+    include:
+      - ${Conf.include_common}
+    environment:
+      variables:
+        mysql_host: ${Conf.mysql_host}
+        mysql_port: ${Conf.mysql_port}
+        mysql_user: ${Conf.mysql_user}
+        mysql_password: ${Conf.mysql_password}
+        mysql_db: ${Conf.mysql_db}
+
+
+Blog_Web_getArticleList:
+  component: "@serverless/tencent-scf"
+  inputs:
+    name: Blog_Web_getArticleList
+    description: 获取分类下文章列表
+    codeUri: ./cloudFunctions/getArticleList
+    handler: ${Conf.handler}
+    runtime: ${Conf.runtime}
+    region:  ${Conf.region}
+    include:
+      - ${Conf.include_common}
+    environment:
+      variables:
+        mysql_host: ${Conf.mysql_host}
+        mysql_port: ${Conf.mysql_port}
+        mysql_user: ${Conf.mysql_user}
+        mysql_password: ${Conf.mysql_password}
+        mysql_db: ${Conf.mysql_db}
+
+Blog_Web_getHotArticleList:
+  component: "@serverless/tencent-scf"
+  inputs:
+    name: Blog_Web_getHotArticleList
+    description: 获取热门文章列表
+    codeUri: ./cloudFunctions/getHotArticleList
+    handler: ${Conf.handler}
+    runtime: ${Conf.runtime}
+    region:  ${Conf.region}
+    include:
+      - ${Conf.include_common}
+    environment:
+      variables:
+        mysql_host: ${Conf.mysql_host}
+        mysql_port: ${Conf.mysql_port}
+        mysql_user: ${Conf.mysql_user}
+        mysql_password: ${Conf.mysql_password}
+        mysql_db: ${Conf.mysql_db}
+
+Blog_Web_getCategoryList:
+  component: "@serverless/tencent-scf"
+  inputs:
+    name: Blog_Web_getCategoryList
+    description: 获取分类列表
+    codeUri: ./cloudFunctions/getCategoryList
+    handler: ${Conf.handler}
+    runtime: ${Conf.runtime}
+    region:  ${Conf.region}
+    include:
+      - ${Conf.include_common}
+    environment:
+      variables:
+        mysql_host: ${Conf.mysql_host}
+        mysql_port: ${Conf.mysql_port}
+        mysql_user: ${Conf.mysql_user}
+        mysql_password: ${Conf.mysql_password}
+        mysql_db: ${Conf.mysql_db}
+
+Blog_Web_getTagsList:
+  component: "@serverless/tencent-scf"
+  inputs:
+    name: Blog_Web_getTagsList
+    description: 获取标签列表
+    codeUri: ./cloudFunctions/getTagsList
+    handler: ${Conf.handler}
+    runtime: ${Conf.runtime}
+    region:  ${Conf.region}
+    include:
+      - ${Conf.include_common}
+    environment:
+      variables:
+        mysql_host: ${Conf.mysql_host}
+        mysql_port: ${Conf.mysql_port}
+        mysql_user: ${Conf.mysql_user}
+        mysql_password: ${Conf.mysql_password}
+        mysql_db: ${Conf.mysql_db}
+
+Blog_Web_getComments:
+  component: "@serverless/tencent-scf"
+  inputs:
+    name: Blog_Web_getComments
+    description: 获取评论列表
+    codeUri: ./cloudFunctions/getComments
+    handler: ${Conf.handler}
+    runtime: ${Conf.runtime}
+    region:  ${Conf.region}
+    include:
+      - ${Conf.include_common}
+    environment:
+      variables:
+        mysql_host: ${Conf.mysql_host}
+        mysql_port: ${Conf.mysql_port}
+        mysql_user: ${Conf.mysql_user}
+        mysql_password: ${Conf.mysql_password}
+        mysql_db: ${Conf.mysql_db}
+
+Blog_Web_updateArticleWatched:
+  component: "@serverless/tencent-scf"
+  inputs:
+    name: Blog_Web_updateArticleWatched
+    description: 增加文章阅读量
+    codeUri: ./cloudFunctions/updateArticleWatched
+    handler: ${Conf.handler}
+    runtime: ${Conf.runtime}
+    region:  ${Conf.region}
+    include:
+      - ${Conf.include_common}
+    environment:
+      variables:
+        mysql_host: ${Conf.mysql_host}
+        mysql_port: ${Conf.mysql_port}
+        mysql_user: ${Conf.mysql_user}
+        mysql_password: ${Conf.mysql_password}
+        mysql_db: ${Conf.mysql_db}
+
+Blog_Web_getSentence:
+  component: "@serverless/tencent-scf"
+  inputs:
+    name: Blog_Web_getSentence
+    description: 获取名言警句
+    codeUri: ./cloudFunctions/getSentence
+    handler: ${Conf.handler}
+    runtime: ${Conf.runtime}
+    region:  ${Conf.region}
+    include:
+      - ${Conf.include_common}
+
+Blog_Admin:
+  component: '@serverless/tencent-scf'
+  inputs:
+    name: Blog_Admin
+    description: 后台服务
+    codeUri: ./cloudFunctions/admin
+    handler: ${Conf.handler}
+    runtime: ${Conf.runtime}
+    region:  ${Conf.region}
+    memorySize: 1024
+    timeout: 100
+    include:
+      - ${Conf.include_common}
+    environment:
+      variables:
+        mysql_host: ${Conf.mysql_host}
+        mysql_port: ${Conf.mysql_port}
+        mysql_user: ${Conf.mysql_user}
+        mysql_password: ${Conf.mysql_password}
+        mysql_db: ${Conf.mysql_db}
+        admin_user: ${Conf.admin_user}
+        admin_password: ${Conf.admin_password}
+        tencent_secret_id: ${Conf.tencent_secret_id}
+        tencent_secret_key: ${Conf.tencent_secret_key}
+        tencent_appid: ${Conf.tencent_appid}
+
+Blog_Admin_updateArticle:
+  component: "@serverless/tencent-scf"
+  inputs:
+    name: Blog_Admin_updateArticle
+    description: 文章修改和增加后的动作
+    codeUri: ./cloudFunctions/updateArticle
+    handler: ${Conf.handler}
+    runtime: ${Conf.runtime}
+    region:  ${Conf.region}
+    include:
+      - ${Conf.include_common}
+    environment:
+      variables:
+        mysql_host: ${Conf.mysql_host}
+        mysql_port: ${Conf.mysql_port}
+        mysql_user: ${Conf.mysql_user}
+        mysql_password: ${Conf.mysql_password}
+        mysql_db: ${Conf.mysql_db}
+
+# 创建API网关Servic
+APIService:
+  component: "@serverless/tencent-apigateway"
+  inputs:
+    region: ${Conf.region}
+    protocols:
+      - http
+      - https
+    serviceName: Serverless_blog
+    environment: release
+    endpoints:
+      - path: /web/comment/add
+        description: 添加评论
+        method: POST
+        enableCORS: TRUE
+        function:
+          functionName: Blog_Web_addComment
+      - path: /web/article/content/get
+        description: 获取文章内容
+        method: POST
+        enableCORS: TRUE
+        function:
+          functionName: Blog_Web_getArticleContent
+      - path: /web/article/list/get
+        description: 获取分类下文章列表
+        method: POST
+        enableCORS: TRUE
+        function:
+          functionName: Blog_Web_getArticleList
+      - path: /web/category/list/get
+        description: 获取分类列表
+        method: POST
+        enableCORS: TRUE
+        function:
+          functionName: Blog_Web_getCategoryList
+      - path: /web/comment/get
+        description: 获取评论列表
+        method: POST
+        enableCORS: TRUE
+        function:
+          functionName: Blog_Web_getComments
+      - path: /web/article/watched/update
+        description: 增加文章阅读量
+        method: POST
+        enableCORS: TRUE
+        function:
+          functionName: Blog_Web_updateArticleWatched
+      - path: /web/sentence/get
+        description: 获取名言警句
+        method: POST
+        enableCORS: TRUE
+        function:
+          functionName: Blog_Web_getSentence
+      - path: /web/article/list/hot/get
+        description: 获取分类下文章列表
+        method: POST
+        enableCORS: TRUE
+        function:
+          functionName: Blog_Web_getHotArticleList
+      - path: /web/tags/list/get
+        description: 获取标签列表
+        method: POST
+        enableCORS: TRUE
+        function:
+          functionName: Blog_Web_getTagsList
+      - path: /admin
+        description: 后台服务
+        method: ANY
+        function:
+          functionName: Blog_Admin
+          isIntegratedResponse: TRUE

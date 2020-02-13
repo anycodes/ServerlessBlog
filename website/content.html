@@ -1,0 +1,430 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <!--[if lte IE 8]>
+    <script src="static/js/ie/html5shiv.js"></script><![endif]-->
+    <link rel="stylesheet" href="static/css/main.css"/>
+    <meta name="keyword" content="{{ keywords }}"/>
+    <meta name="description" content="{{ description }}"/>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <script type="text/javascript" src="static/js/tagcloud.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/css/jsdaima.com.css">
+    <script type="text/javascript" src="static/ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+    <link rel="stylesheet" href="static/ueditor/third-party/SyntaxHighlighter/shCoreDefault.css" type="text/css"/>
+    <!--[if lte IE 9]>
+    <link rel="stylesheet" href="static/css/ie9.css"/><![endif]-->
+    <!--[if lte IE 8]>
+    <link rel="stylesheet" href="static/css/ie8.css"/><![endif]-->
+    <style>
+        img {
+            max-width: 100%;
+        }
+    </style>
+    <style>
+        .img-warp {
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .img-box {
+            width: 100%;
+            height: 0px;
+            padding-bottom: 45%;
+            overflow: hidden;
+            margin: 0;
+            position: relative;
+        }
+
+        .img-box img {
+            width: 100%;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-top: 0px;
+            padding-top: 0px;
+        }
+
+        a:link {
+            text-decoration: none;
+            color: grey;
+        }
+
+        a:visited {
+            text-decoration: none;
+            color: grey;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: grey;
+        }
+
+        a:active {
+            text-decoration: none;
+            color: grey;
+        }
+
+    </style>
+    <script type="text/javascript">
+        function checkall() {
+            var name = document.getElementById("name");
+            var name_z = name.value;
+            var email = document.getElementById("email");
+            var email_z = email.value;
+            var message = document.getElementById("comment");
+            var message_z = message.value;
+            if (name_z == "" || name_z == null || email_z == "" || email_z == null || message_z == "" || message_z == null) {
+                alert("账号,邮箱和留言均不可为空");
+                return false;
+            }
+        }
+    </script>
+    <script>
+
+        SyntaxHighlighter.all() //执行代码高亮
+
+        var baseUrl = 'http://service-23ybmuq7-1256773370.sh.apigw.tencentcs.com/release'
+        var tagsUri = "/web/tags/list/get"
+        var categoryListUri = "/web/category/list/get"
+        var hotAritiListUri = "/web/article/list/hot/get"
+        var sentenceUri = "/web/sentence/get"
+        var articleWatchedUri = "/web/article/watched/update"
+        var articleContentUri = "/web/article/content/get"
+        var addCommentUri = "/web/comment/add"
+        var getCommentsUri = "/web/comment/get"
+
+        function GetRequest() {
+            var url = decodeURI(location.search); //获取url中"?"符后的字符串
+            var theRequest = new Object();
+            if (url.indexOf("?") != -1) {
+                var str = url.substr(1);
+                strs = str.split("&");
+                for (var i = 0; i < strs.length; i++) {
+                    theRequest[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+                }
+            }
+            return theRequest;
+        }
+
+        function getCategoryList(thisCategory) {
+            var xmlhttp = window.XMLHttpRequest ? (new XMLHttpRequest()) : (new ActiveXObject("Microsoft.XMLHTTP"))
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    if (JSON.parse(xmlhttp.responseText)["error"]) {
+                        alert(JSON.parse(xmlhttp.responseText)["message"]);
+                    } else {
+                        var catagoryList = JSON.parse(xmlhttp.responseText)["message"]
+                        var category = document.getElementById("category");
+                        var tempCategoryinnerHTML = '<li> <a href="list.html">全部</a> </li>'
+
+                        for (var i = 0; i < catagoryList.length; i++) {
+                            if (thisCategory == catagoryList[i].id) {
+                                tempCategoryinnerHTML += `<li> <a href="list.html?category=${catagoryList[i].id}"><b><i>${catagoryList[i].name}</i></b></a></li>`
+                            } else {
+                                tempCategoryinnerHTML += `<li> <a href="list.html?category=${catagoryList[i].id}"> ${catagoryList[i].name}</a> </li>`
+                            }
+                        }
+                        category.innerHTML = tempCategoryinnerHTML
+                    }
+                }
+            }
+            var categoryUrl = baseUrl + categoryListUri
+            xmlhttp.open("POST", categoryUrl, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.send(JSON.stringify({}));
+        }
+
+        function getHotAritiList() {
+            var xmlhttp = window.XMLHttpRequest ? (new XMLHttpRequest()) : (new ActiveXObject("Microsoft.XMLHTTP"))
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    if (JSON.parse(xmlhttp.responseText)["error"]) {
+                        alert(JSON.parse(xmlhttp.responseText)["message"]);
+                    } else {
+                        var showArticles = ""
+                        var articleList = JSON.parse(xmlhttp.responseText)["message"]
+                        for (var i = 0; i < articleList.length; i++) {
+                            var tempArticle = `<article><a href="content.html?id=${articleList[i].id}" class="image"><div class="img-warp"><div class="img-box"><img src="${articleList[i].picture}" alt=""/></div></div></a><p style="width: 300px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"><a href="content.html?id=${articleList[i].id}">${articleList[i].title}</p></article>`
+                            showArticles = showArticles + tempArticle
+                        }
+                        if (showArticles) {
+                            document.getElementById("hot_article").innerHTML = showArticles
+                        }
+                    }
+                }
+            }
+            var categoryUrl = baseUrl + hotAritiListUri
+            xmlhttp.open("POST", categoryUrl, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.send(JSON.stringify({}));
+        }
+
+        function getSentence() {
+            var xmlhttp = window.XMLHttpRequest ? (new XMLHttpRequest()) : (new ActiveXObject("Microsoft.XMLHTTP"))
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    document.getElementById("sentence").innerText = JSON.parse(xmlhttp.responseText)["error"] ? "教育植根于爱。----鲁迅" : JSON.parse(xmlhttp.responseText)["message"]
+                }
+            }
+            var categoryUrl = baseUrl + sentenceUri
+            xmlhttp.open("POST", categoryUrl, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.send(JSON.stringify({}));
+        }
+
+        function updateArticleWatched() {
+            var thisId = GetRequest().id
+            var xmlhttp = window.XMLHttpRequest ? (new XMLHttpRequest()) : (new ActiveXObject("Microsoft.XMLHTTP"))
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    console.log(JSON.parse(xmlhttp.responseText))
+                }
+            }
+            var categoryUrl = baseUrl + articleWatchedUri
+            xmlhttp.open("POST", categoryUrl, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.send(JSON.stringify({"id": thisId}));
+        }
+
+        function getArticleContent() {
+            var thisId = GetRequest().id
+            if (thisId) {
+                var xmlhttp = window.XMLHttpRequest ? (new XMLHttpRequest()) : (new ActiveXObject("Microsoft.XMLHTTP"))
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        var article = JSON.parse(xmlhttp.responseText)
+                        if (article["error"]) {
+                            alert(article["message"])
+                        } else {
+                            var metaAtrr = document.getElementsByTagName("meta")
+                            getCategoryList(article["message"].category)
+                            document.title = `${article["message"].title} - ${document.title}`
+                            document.getElementById("title").innerText = article["message"].title
+                            document.getElementById("article_category").innerText = article["message"].category
+                            document.getElementById("article_watched").innerText = article["message"].watched
+                            document.getElementById("article_publish").innerText = article["message"].publish
+                            document.getElementById("content").innerHTML = article["message"].content
+                            var tempTags = ""
+                            var tagsStr = ""
+                            for (let i = 0; i < article["message"].tags.length; i++) {
+                                tempTags += `<a href="list.html?tag=${article["message"].tags[i].id}">${article["message"].tags[i].name}</a>&nbsp;&nbsp;&nbsp;`
+                                tagsStr += `${article["message"].tags[i].name},`
+                            }
+                            if (!tempTags) {
+                                tempTags = "暂无标签"
+                            }
+                            for (let i = 0; i < metaAtrr.length; i++) {
+                                if (metaAtrr[i]['name'] == 'keyword') {
+                                    metaAtrr[i].content = tagsStr + metaAtrr[i].content
+                                }
+                                if (metaAtrr[i]['name'] == 'description') {
+                                    metaAtrr[i].content = article["message"].description
+                                }
+                            }
+                            document.getElementById("article_tags").innerHTML = tempTags
+                        }
+                    }
+                }
+                var categoryUrl = baseUrl + articleContentUri
+                xmlhttp.open("POST", categoryUrl, true);
+                xmlhttp.setRequestHeader("Content-type", "application/json");
+                xmlhttp.send(JSON.stringify({"id": thisId}));
+            } else {
+                alert("未获得到文章信息")
+            }
+
+        }
+
+        function addComment() {
+            var thisId = GetRequest().id
+            if (thisId) {
+                var xmlhttp = window.XMLHttpRequest ? (new XMLHttpRequest()) : (new ActiveXObject("Microsoft.XMLHTTP"))
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        var article = JSON.parse(xmlhttp.responseText)
+                        alert(article["message"])
+                    }
+                }
+                var categoryUrl = baseUrl + addCommentUri
+                xmlhttp.open("POST", categoryUrl, true);
+                xmlhttp.setRequestHeader("Content-type", "application/json");
+                xmlhttp.send(JSON.stringify({
+                    "id": thisId,
+                    "content": document.getElementById('comment_content').value,
+                    "user": document.getElementById('comment_user').value,
+                    "email": document.getElementById('comment_email').value
+                }));
+            } else {
+                alert("留言失败")
+            }
+        }
+
+        function getComments() {
+            var thisArticle = GetRequest().id
+            if (thisArticle) {
+                var xmlhttp = window.XMLHttpRequest ? (new XMLHttpRequest()) : (new ActiveXObject("Microsoft.XMLHTTP"))
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        if (JSON.parse(xmlhttp.responseText)["error"]) {
+                            alert(JSON.parse(xmlhttp.responseText)["message"]);
+                        } else {
+                            var comment = JSON.parse(xmlhttp.responseText)["message"]
+                            var commentStr = ""
+                            for (var i = 0; i < comment.length; i++) {
+                                tempStr = `<div class="box"><b>${comment[i].user}</b>&nbsp;&nbsp;(<b>${comment[i].publish}</b>)：<div style="margin-left: 20px;margin-top: 20px">${comment[i].content}</div>`
+                                if (comment[i].remark) {
+                                    tempStr = tempStr + `<hr><blockquote>博主回复的：${comment[i].remark}</blockquote>`
+                                }
+                                tempStr = tempStr + `</div>`
+                                commentStr = commentStr + tempStr
+                            }
+                            if (!commentStr) {
+                                commentStr = "暂无留言"
+                            }
+                            document.getElementById("comments").innerHTML = commentStr
+                        }
+                    }
+
+                }
+                var categoryUrl = baseUrl + getCommentsUri
+                xmlhttp.open("POST", categoryUrl, true);
+                xmlhttp.setRequestHeader("Content-type", "application/json");
+                xmlhttp.send(JSON.stringify({"id": thisArticle}));
+            } else {
+                alert("获得留言列表失败")
+            }
+        }
+
+        updateArticleWatched()
+        getHotAritiList()
+        getArticleContent()
+        getSentence()
+        getComments()
+
+    </script>
+</head>
+<body>
+<!-- Wrapper -->
+<div id="wrapper">
+    <!-- Main -->
+    <div id="main">
+        <div class="inner">
+
+            <!-- Header -->
+            <header id="header">
+                <a href="" class="logo"><strong>名言：</strong><span id="sentence"></span></a>
+            </header>
+            <!-- Content -->
+            <section>
+                <header class="main"><h1 id="title"></h1></header>
+                <div class="box">
+                    分类：<span id="article_category"></span>,
+                    浏览次数：<span id="article_watched"></span>，
+                    发表日期：<span id="article_publish"></span>
+                    <br>标签：<span id="article_tags"></span>
+                </div>
+                <div id="content"></div>
+                <hr>
+                <h3>留言列表</h3>
+                <div id="comments"></div>
+                <hr>
+                <h3>我要留言</h3>
+                <div class="row uniform">
+                    <div class="6u 12u$(xsmall)">
+                        <input type="text" name="name" placeholder="姓名" id="comment_user"/>
+                    </div>
+                    <div class="6u$ 12u$(xsmall)">
+                        <input type="email" name="email" placeholder="邮箱" id="comment_email"/>
+                    </div>
+                    <div class="12u$">
+                        <textarea name="comment" placeholder="留言信息" rows="6" id="comment_content"></textarea>
+                    </div>
+                    <div class="12u$">
+                        <ul class="actions">
+                            <li><input type="submit" value="留言" class="special" onclick="addComment()"/></li>
+                            <li><input type="reset" value="重置"/></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <div class="inner">
+            <!-- Search -->
+            <section id="search" class="alt">
+                <h2>{{ title }}</h2>
+            </section>
+            <!-- Menu -->
+            <nav id="menu">
+                <header class="major"><h2>分类列表</h2></header>
+                <ul id="category"></ul>
+            </nav>
+            <nav id="hot">
+                <header class="major"><h2>热门标签</h2></header>
+                <div class="box">
+                    <div class="wrapper">
+                        <div class="tagcloud" style="width: 100%; min-width: 200px" id="tags"></div>
+                    </div><!--wrapper-->
+                </div>
+            </nav><!-- Menu -->
+            <!-- Section -->
+            <section>
+                <header class="major">
+                    <h2>热门文章</h2>
+                </header>
+                <div class="mini-posts" id="hot_article"></div>
+            </section>
+            <!-- Section -->
+            <section>
+                <header class="major">
+                    <h2>博主信息</h2>
+                </header>
+                <p>{{ about_me }}}</p>
+                <ul class="contact">
+                    <li class="fa-envelope-o">{{ email }}</li>
+                    <li class="fa-home">{{ host }}</li>
+                </ul>
+            </section>
+            <!-- Footer -->
+            <footer id="footer">
+                <p class="copyright">&copy; Powered By Anycodes <br>&copy; WebSite Name: <a
+                        href="/index">{{ title }}</a>.</p>
+            </footer>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- Scripts -->
+<script src="static/js/jquery.min.js"></script>
+<script src="static/js/skel.min.js"></script>
+<script src="static/js/util.js"></script>
+<script type="text/javascript" src="static/js/tagcloud.js"></script>
+<!--[if lte IE 8]>
+<script src="static/js/ie/respond.min.js"></script><![endif]-->
+<script src="static/js/main.js"></script>
+<script type="text/javascript">
+    /*3D标签云*/
+    tagcloud({
+        selector: ".tagcloud",  //元素选择器
+        fontsize: 10,       //基本字体大小, 单位px
+        radius: 35,         //滚动半径, 单位px
+        mspeed: "normal",   //滚动最大速度, 取值: slow, normal(默认), fast
+        ispeed: "normal",   //滚动初速度, 取值: slow, normal(默认), fast
+        direction: 135,     //初始滚动方向, 取值角度(顺时针360): 0对应top, 90对应left, 135对应right-bottom(默认)...
+        keep: false          //鼠标移出组件后是否继续随鼠标滚动, 取值: false, true(默认) 对应 减速至初速度滚动, 随鼠标滚动
+    });
+</script>
+</body>
+</html>
+

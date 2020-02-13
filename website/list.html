@@ -1,0 +1,309 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <!--[if lte IE 8]>
+    <script src="static/js/ie/html5shiv.js"></script><![endif]-->
+    <link rel="stylesheet" href="static/css/main.css"/>
+    <meta name="keyword" content="{{ keywords }}"/>
+    <meta name="description" content="{{ description }}"/>
+    <link rel="stylesheet" type="text/css" href="static/css/jsdaima.com.css">
+    <!--[if lte IE 9]>
+    <link rel="stylesheet" href="static/css/ie9.css"/><![endif]-->
+    <!--[if lte IE 8]>
+    <link rel="stylesheet" href="static/css/ie8.css"/><![endif]-->
+    <style>
+        .img-warp {
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .img-box {
+            width: 100%;
+            height: 0px;
+            padding-bottom: 45%;
+            overflow: hidden;
+            margin: 0;
+            position: relative;
+        }
+
+        .img-box img {
+            width: 100%;
+        }
+
+        pre {
+            max-width: 100%;
+        }
+
+        p {
+            word-break: break-all;
+        }
+    </style>
+    <script>
+
+        var baseUrl = 'http://service-23ybmuq7-1256773370.sh.apigw.tencentcs.com/release'
+        var tagsUri = "/web/tags/list/get"
+        var categoryListUri = "/web/category/list/get"
+        var ariticleListUri = "/web/article/list/get"
+        var hotAritiListUri = "/web/article/list/hot/get"
+        var sentenceUri = "/web/sentence/get"
+
+        function GetRequest() {
+            var url = decodeURI(location.search); //获取url中"?"符后的字符串
+            var theRequest = new Object();
+            if (url.indexOf("?") != -1) {
+                var str = url.substr(1);
+                strs = str.split("&");
+                for (var i = 0; i < strs.length; i++) {
+                    theRequest[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+                }
+            }
+            return theRequest;
+        }
+
+        function getCategoryList() {
+            var thisCategory = GetRequest().category
+            var xmlhttp = window.XMLHttpRequest ? (new XMLHttpRequest()) : (new ActiveXObject("Microsoft.XMLHTTP"))
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    if (JSON.parse(xmlhttp.responseText)["error"]) {
+                        alert(JSON.parse(xmlhttp.responseText)["message"]);
+                    } else {
+                        var catagoryList = JSON.parse(xmlhttp.responseText)["message"]
+                        var category = document.getElementById("category");
+                        var tempCategoryinnerHTML = thisCategory ? '<li> <a href="list.html">全部</a> </li>' : '<li> <a href=""><b><i>全部</i></b></a> </li>'
+
+                        for (var i = 0; i < catagoryList.length; i++) {
+                            if (thisCategory == catagoryList[i].id) {
+                                document.title = `分类: ${catagoryList[i].name} 列表 - ${document.title}`
+                                tempCategoryinnerHTML += `<li> <a href=""><b><i>${catagoryList[i].name}</i></b></a></li>`
+                            } else {
+                                tempCategoryinnerHTML += `<li> <a href="list.html?category=${catagoryList[i].id}"> ${catagoryList[i].name}</a> </li>`
+                            }
+                        }
+                        category.innerHTML = tempCategoryinnerHTML
+                    }
+                }
+            }
+            var categoryUrl = baseUrl + categoryListUri
+            xmlhttp.open("POST", categoryUrl, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.send(JSON.stringify({}));
+        }
+
+        function getAriticleList() {
+            var thisCategory = GetRequest().category
+            var thisTag = GetRequest().tag
+            var thisPage = GetRequest().page || 1
+            var xmlhttp = window.XMLHttpRequest ? (new XMLHttpRequest()) : (new ActiveXObject("Microsoft.XMLHTTP"))
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    if (JSON.parse(xmlhttp.responseText)["error"]) {
+                        alert(JSON.parse(xmlhttp.responseText)["message"]);
+                    } else {
+                        var showArticles = ""
+                        var articleList = JSON.parse(xmlhttp.responseText)["message"]["data"]
+                        if (articleList.length == 0) {
+                            document.getElementById("banner").style.display = "none"
+                            document.getElementById("more").innerHTML = "<header class=\"major\"><h2>暂无数据</h2></header>"
+                        } else {
+                            for (var i = 0; i < articleList.length; i++) {
+                                if (i == 0) {
+                                    document.getElementById("banner_title").innerText = articleList[0].title
+                                    document.getElementById("banner_description").innerText = articleList[0].description
+                                    document.getElementById("banner_href").href = "content.html?id=" + articleList[0].id
+                                    document.getElementById("banner_picture").src = articleList[0].picture
+                                } else {
+                                    var tempArticle = `<article><a href="content.html?id=${articleList[i].id}" class="image"><div class="img-warp"><div class="img-box"><img id="pic" src="${articleList[i].picture}" width="100%" height=width /></div></div></a><h3 style="width: 300px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"><a href="content.html?id=${articleList[i].id}">${articleList[i].title}</a></h3><p>${articleList[i].description}</p><ul class="actions"><li><a href="content.html?id=${articleList[i].id}" class="button">阅读</a></li></ul></article>`
+                                    showArticles = showArticles + tempArticle
+                                }
+                            }
+                            if (showArticles) {
+                                document.getElementById("more").innerHTML = `<header class="major"><h2>文章列表</h2></header><div class="posts">${showArticles}</div>`
+                            }
+                            var pags = JSON.parse(xmlhttp.responseText)["message"]["count"] / 10
+                            var thisPage = GetRequest().page || 1
+                            var startPage = thisPage <= 5 ? 1 : thisPage - 5
+                            var endPage = pags - thisPage <= 5 ? pags : thisPage + 5
+                            var pageStr = ""
+                            var tempUrl = "?"
+                            var url = decodeURI(location.search); //获取url中"?"符后的字符串
+                            if (url.indexOf("?") != -1) {
+                                var str = url.substr(1);
+                                strs = str.split("&");
+                                for (var i = 0; i < strs.length; i++) {
+                                    if (strs[i].split("=")[0] != 'page') {
+                                        tempUrl = tempUrl + strs[i] + "&"
+                                    }
+                                }
+                            }
+                            for (let tempPage = startPage; tempPage <= endPage; tempPage++) {
+                                var tempPageStr = thisPage == tempPage ? `<li><a href="#" class="page active">${tempPage}</a></li>` : `<li><a href="${tempUrl}page=${tempPage}" class="page">${tempPage}</a></li>`
+                                console.log(tempPageStr)
+                                pageStr = pageStr + tempPageStr
+                            }
+                            document.getElementById("page").innerHTML = pageStr
+                        }
+                    }
+                }
+            }
+            var categoryUrl = baseUrl + ariticleListUri
+            var postData = {
+                "category": thisCategory,
+                "page": thisPage,
+                "tag": thisTag
+            }
+            xmlhttp.open("POST", categoryUrl, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.send(JSON.stringify(postData));
+        }
+
+        function getHotAritiList() {
+            var xmlhttp = window.XMLHttpRequest ? (new XMLHttpRequest()) : (new ActiveXObject("Microsoft.XMLHTTP"))
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    if (JSON.parse(xmlhttp.responseText)["error"]) {
+                        alert(JSON.parse(xmlhttp.responseText)["message"]);
+                    } else {
+                        var showArticles = ""
+                        var articleList = JSON.parse(xmlhttp.responseText)["message"]
+                        for (var i = 0; i < articleList.length; i++) {
+                            var tempArticle = `<article><a href="content.html?id=${articleList[i].id}" class="image"><div class="img-warp"><div class="img-box"><img src="${articleList[i].picture}" alt=""/></div></div></a><p style="width: 300px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"><a href="content.html?id=${articleList[i].id}">${articleList[i].title}</p></article>`
+                            showArticles = showArticles + tempArticle
+                        }
+                        if (showArticles) {
+                            document.getElementById("hot_article").innerHTML = showArticles
+                        }
+                    }
+                }
+            }
+            var categoryUrl = baseUrl + hotAritiListUri
+            xmlhttp.open("POST", categoryUrl, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.send(JSON.stringify({}));
+        }
+
+        function getSentence() {
+            var xmlhttp = window.XMLHttpRequest ? (new XMLHttpRequest()) : (new ActiveXObject("Microsoft.XMLHTTP"))
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    document.getElementById("sentence").innerText = JSON.parse(xmlhttp.responseText)["error"] ? "教育植根于爱。----鲁迅" : JSON.parse(xmlhttp.responseText)["message"]
+                }
+            }
+            var categoryUrl = baseUrl + sentenceUri
+            xmlhttp.open("POST", categoryUrl, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.send(JSON.stringify({}));
+        }
+
+        getAriticleList()
+        getCategoryList()
+        getHotAritiList()
+        getSentence()
+    </script>
+</head>
+<body>
+<!-- Wrapper -->
+<div id="wrapper">
+    <!-- Main -->
+    <div id="main">
+        <div class="inner">
+            <!-- Header -->
+            <header id="header">
+                <a href="" class="logo"><strong>名言：</strong><span id="sentence"></span></a>
+            </header>
+            <!-- Banner -->
+            <section id="banner">
+                <div class="content" style="max-width:100%;">
+                    <header><h2 id="banner_title"></h2></header>
+                    <p style="max-width:100%;" id="banner_description"></p>
+                    <ul class="actions">
+                        <li><a href="" class="button big" id="banner_href">阅读全部</a></li>
+                    </ul>
+                </div>
+                <span class="image object"><img src="" style="max-height: 300px" id="banner_picture"/></span>
+            </section>
+            <!-- Section -->
+            <section id="more">
+            </section>
+            <ul class="pagination" id="page" style="text-align: center"></ul>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <div class="inner">
+
+            <!-- Search -->
+            <section id="search" class="alt">
+                <h2>{{ title }}</h2>
+            </section>
+            <!-- Menu -->
+            <nav id="menu">
+                <header class="major"><h2>分类列表</h2></header>
+                <ul id="category"></ul>
+            </nav>
+
+            <nav id="hot">
+                <header class="major"><h2>热门标签</h2></header>
+                <div class="box">
+                    <div class="wrapper">
+                        <div class="tagcloud" style="width: 100%; min-width: 200px" id="tags"></div>
+                    </div><!--wrapper-->
+                </div>
+            </nav><!-- Menu -->
+            <!-- Section -->
+            <section>
+                <header class="major">
+                    <h2>热门文章</h2>
+                </header>
+                <div class="mini-posts" id="hot_article"></div>
+            </section>
+            <!-- Section -->
+            <section>
+                <header class="major">
+                    <h2>博主信息</h2>
+                </header>
+                <p>{{ about_me }}}</p>
+                <ul class="contact">
+                    <li class="fa-envelope-o">{{ email }}</li>
+                    <li class="fa-home">{{ host }}</li>
+                </ul>
+            </section>
+
+            <!-- Footer -->
+            <footer id="footer">
+                <p class="copyright">&copy; Powered By Anycodes <br>&copy; WebSite Name: <a
+                        href="/index">{{ title }}</a>.</p>
+            </footer>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- Scripts -->
+<script src="static/js/jquery.min.js"></script>
+<script src="static/js/skel.min.js"></script>
+<script src="static/js/util.js"></script>
+<script type="text/javascript" src="static/js/tagcloud.js"></script>
+<!--[if lte IE 8]>
+<script src="static/js/ie/respond.min.js"></script><![endif]-->
+<script src="static/js/main.js"></script>
+<script type="text/javascript">
+    /*3D标签云*/
+    tagcloud({
+        selector: ".tagcloud",  //元素选择器
+        fontsize: 10,       //基本字体大小, 单位px
+        radius: 35,         //滚动半径, 单位px
+        mspeed: "normal",   //滚动最大速度, 取值: slow, normal(默认), fast
+        ispeed: "normal",   //滚动初速度, 取值: slow, normal(默认), fast
+        direction: 135,     //初始滚动方向, 取值角度(顺时针360): 0对应top, 90对应left, 135对应right-bottom(默认)...
+        keep: false          //鼠标移出组件后是否继续随鼠标滚动, 取值: false, true(默认) 对应 减速至初速度滚动, 随鼠标滚动
+    });
+</script>
+</body>
+</html>
+
