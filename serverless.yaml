@@ -7,7 +7,7 @@ Conf:
     handler: index.main_handler
     include_common: ./common
     blog_user: Dfounder
-    blog_email: service@anycodes.cngit
+    blog_email: service@anycodes.cn
     blog_about_me: 这就是我的博客
     blog_host: blog.0duzhan.com
     website_title: Serverless Blog System
@@ -247,6 +247,7 @@ Blog_Admin_updateArticle:
         mysql_user: ${Conf.mysql_user}
         mysql_password: ${Conf.mysql_password}
         mysql_db: ${Conf.mysql_db}
+        region: ${Conf.region}
 
 # 创建API网关Servic
 APIService:

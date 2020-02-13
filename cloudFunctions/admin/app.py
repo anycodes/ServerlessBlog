@@ -186,7 +186,7 @@ def addTags(mapper, connection, target):
 
         clientProfile = ClientProfile()
         clientProfile.httpProfile = httpProfile
-        client = scf_client.ScfClient(cred, "", clientProfile)
+        client = scf_client.ScfClient(cred, os.environ.get("region"), clientProfile)
 
         req = models.InvokeRequest()
         params = '{"FunctionName":"Blog_Admin_updateArticle","InvocationType":"Event","ClientContext":"{\\"id\\": %s}","Namespace":"default"}' % (
