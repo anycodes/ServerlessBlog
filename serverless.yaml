@@ -228,6 +228,7 @@ Blog_Admin:
         tencent_secret_id: ${Conf.tencent_secret_id}
         tencent_secret_key: ${Conf.tencent_secret_key}
         tencent_appid: ${Conf.tencent_appid}
+        region: ${Conf.region}
 
 Blog_Admin_updateArticle:
   component: "@serverless/tencent-scf"
