@@ -29,11 +29,12 @@ def main_handler(event, context):
         content = article["content"]
         h = html2text.HTML2Text()
         h.ignore_links = True
-        for eve in SnowNLP(h.handle(content)).keywords(5):
-            tid = mysql.getTag(eve)
-            if not tid:
-                tid = mysql.addTag(eve)
-            mysql.addArticleTag(aid, tid)
+        for eve in SnowNLP(h.handle(content)).keywords(10):
+            if len(eve) >= 2 and len(eve) <= 5:
+                tid = mysql.getTag(eve)
+                if not tid:
+                    tid = mysql.addTag(eve)
+                mysql.addArticleTag(aid, tid)
         return returnCommon.return_msg(False, "")
     except Exception as e:
         print(e)
