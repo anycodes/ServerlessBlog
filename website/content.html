@@ -90,7 +90,7 @@
 
         SyntaxHighlighter.all() //执行代码高亮
 
-        var baseUrl = `http://${window.env.apiUrl}/release`
+        var baseUrl = `${document.location.protocol}://${window.env.apiUrl}/release`
         var tagsUri = "/web/tags/list/get"
         var categoryListUri = "/web/category/list/get"
         var hotAritiListUri = "/web/article/list/hot/get"
