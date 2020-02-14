@@ -1,8 +1,8 @@
 # -*- coding: utf8 -*-
 
-import json
+import json,re
 import html2text
-from snownlp import SnowNLP
+import jieba.analyse
 
 try:
     import returnCommon
@@ -27,9 +27,13 @@ def main_handler(event, context):
         article = mysql.getArticleContent(aid)
         print(article)
         content = article["content"]
+        pat = re.compile(r'[\u4e00-\u9fa5]+')
+
         h = html2text.HTML2Text()
         h.ignore_links = True
-        for eve in SnowNLP(h.handle(content)).keywords(10):
+        content = "，".join(pat.findall(h.handle(content)))
+        keywords = jieba.analyse.extract_tags(content, topK=10, withWeight=False, allowPOS=('n', 'vn'))
+        for eve in keywords:
             if len(eve) >= 2 and len(eve) <= 5:
                 tid = mysql.getTag(eve)
                 if not tid:
