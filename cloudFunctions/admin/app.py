@@ -1,6 +1,8 @@
 # coding: utf-8
 from flask import Flask
-import html2text, os
+import html2text, os, re
+import urllib.request
+import hashlib
 from snownlp import SnowNLP
 from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
@@ -16,6 +18,10 @@ from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 from tencentcloud.scf.v20180416 import scf_client, models
+from qcloud_cos import CosConfig
+from qcloud_cos import CosS3Client
+from qcloud_cos import CosServiceError
+from qcloud_cos import CosClientError
 
 if not os.environ.get('mysql_user'):
     import common.testCommon
@@ -35,6 +41,12 @@ SQLALCHEMY_DATABASE_URI = "{}+{}://{}:{}@{}:{}/{}?charset=utf8". \
 
 Base = declarative_base()
 metadata = Base.metadata
+
+secret_id = os.environ.get("tencent_secret_id")
+secret_key = os.environ.get("tencent_secret_key")
+region = os.environ.get("region")
+config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key)
+client = CosS3Client(config)
 
 
 class Category(Base):
@@ -167,6 +179,26 @@ class CommentView(ModelView):
     column_list = ['article1', 'content', 'user', 'publish', 'is_show']
 
 
+def savePic2Cos(content):
+    img_list = re.findall('<img(.*?)src="(.*?)"', content)
+    for eve_img in img_list:
+        try:
+            eve_img = eve_img[1]
+            print(eve_img)
+            image_path = eve_img.replace(re.match("https://(.*?)/", eve_img)[0], "")
+            temp_data = urllib.request.urlopen(eve_img).read()
+            response = client.put_object(
+                Bucket=os.environ.get("website_bucket"),
+                Body=temp_data,
+                Key='/blogcache/img/' + hashlib.md5(image_path.encode("utf-8")).hexdigest(),
+            )
+            content = content.replace(eve_img, 'https://%s.cos.%s.myqcloud.com' % (
+                os.environ.get("website_bucket"), os.environ.get("region")))
+        except:
+            pass
+    return content
+
+
 @listens_for(Article, 'before_insert')
 @listens_for(Article, 'before_update')
 def addDescription(mapper, connection, target):
@@ -174,11 +206,13 @@ def addDescription(mapper, connection, target):
     h.ignore_links = True
     if not target.description or len(target.description) <= 1:
         target.description = ", ".join(SnowNLP(h.handle(target.content)).summary(5))
+    target.content = savePic2Cos(target.content)
 
 
 @listens_for(Article, 'after_insert')
 @listens_for(Article, 'after_update')
 def addTags(mapper, connection, target):
+    print("add tags")
     try:
         cred = credential.Credential(os.environ.get('tencent_secret_id'), os.environ.get('tencent_secret_key'))
         httpProfile = HttpProfile()
@@ -197,6 +231,7 @@ def addTags(mapper, connection, target):
 
     except TencentCloudSDKException as err:
         print(err)
+    print("end add")
 
 
 def create_app(Flask):
@@ -226,4 +261,4 @@ def create_app(Flask):
 
 if __name__ == '__main__':
     app = create_app(Flask)
-    app.run()
+    app.run(port=7777, )
