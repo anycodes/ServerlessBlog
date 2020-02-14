@@ -31,8 +31,8 @@ CosBucket:
   component: '@serverless/tencent-website'
   inputs:
     code:
-      root: website
-      src: dist
+      root: website/dist
+      src: ./
       index: list.html
     region:  ${Conf.region}
     bucketName: ${Conf.website_bucket}
