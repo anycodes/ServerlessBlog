@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="static/css/ie9.css"/><![endif]-->
     <!--[if lte IE 8]>
     <link rel="stylesheet" href="static/css/ie8.css"/><![endif]-->
+    <script type="text/javascript" src="env.js"></script>
     <style>
         .img-warp {
             width: 90%;
@@ -43,7 +44,7 @@
     </style>
     <script>
 
-        var baseUrl = 'http://service-23ybmuq7-1256773370.sh.apigw.tencentcs.com/release'
+        var baseUrl = `http://${window.env.apiUrl}/release`
         var tagsUri = "/web/tags/list/get"
         var categoryListUri = "/web/category/list/get"
         var ariticleListUri = "/web/article/list/get"
@@ -259,7 +260,9 @@
                 <header class="major">
                     <h2>热门文章</h2>
                 </header>
-                <div class="mini-posts" id="hot_article"></div>
+                <div class="mini-posts" id="hot_article">
+
+                </div>
             </section>
             <!-- Section -->
             <section>
