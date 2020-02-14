@@ -203,7 +203,6 @@
 
 							// <=large? Bail.
 								if (skel.breakpoint('large').active) {
-
 									$sidebar_inner
 										.data('locked', 0)
 										.css('position', '')
@@ -216,36 +215,35 @@
 							// Calculate positions.
 								x = Math.max(sh - wh, 0);
 								y = Math.max(0, $window.scrollTop() - x);
-
-							// Lock/unlock.
-								if ($sidebar_inner.data('locked') == 1) {
-
-									if (y <= 0)
-										$sidebar_inner
-											.data('locked', 0)
-											.css('position', '')
-											.css('top', '');
-									else
-										$sidebar_inner
-											.css('top', -1 * x);
-
-								}
-								else {
-
-									if (y > 0)
-										$sidebar_inner
-											.data('locked', 1)
-											.css('position', '')
-											.css('top', -1 * x);
-
-								}
+							// 	console.log(x, y)
+							// 	console.log($sidebar_inner.data('locked'))
+							// // Lock/unlock.
+							// 	if ($sidebar_inner.data('locked') == 1) {
+							// 		if (y <= 0)
+							// 			$sidebar_inner
+							// 				.data('locked', 0)
+							// 				.css('position', '')
+							// 				.css('top', '');
+							// 		else
+							// 			$sidebar_inner
+							// 				.css('top', -1 * x);
+							//
+							// 	}
+							// 	else {
+							// 		if (y > 0){
+							// 			$sidebar_inner
+							// 				.data('locked', 0)
+							// 				.css('position', '')
+							// 				.css('top', -1 * x);
+							// 		}
+							// 	}
 
 						})
 						.on('resize.sidebar-lock', function() {
 
 							// Calculate heights.
 								wh = $window.height();
-								sh = $sidebar_inner.outerHeight() + 30;
+								sh = $sidebar_inner.outerHeight() + 50;
 
 							// Trigger scroll.
 								$window.trigger('scroll.sidebar-lock');
