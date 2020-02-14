@@ -36,6 +36,8 @@ CosBucket:
       index: list.html
     region:  ${Conf.region}
     bucketName: ${Conf.website_bucket}
+    env:
+      apiUrl: ${APIService.subDomain}
 
 # 各个函数的单独配置
 Blog_Web_addComment:
