@@ -182,20 +182,22 @@ class CommentView(ModelView):
 def savePic2Cos(content):
     img_list = re.findall('<img(.*?)src="(.*?)"', content)
     for eve_img in img_list:
-        try:
-            eve_img = eve_img[1]
-            print(eve_img)
-            image_path = eve_img.replace(re.match("https://(.*?)/", eve_img)[0], "")
-            temp_data = urllib.request.urlopen(eve_img).read()
-            response = client.put_object(
-                Bucket=os.environ.get("website_bucket"),
-                Body=temp_data,
-                Key='/blogcache/img/' + hashlib.md5(image_path.encode("utf-8")).hexdigest(),
-            )
-            content = content.replace(eve_img, 'https://%s.cos.%s.myqcloud.com' % (
-                os.environ.get("website_bucket"), os.environ.get("region")))
-        except:
-            pass
+        baseUrl = 'https://%s.cos.%s.myqcloud.com' % (os.environ.get("website_bucket"), os.environ.get("region"))
+        if baseUrl not in eve_img:
+            try:
+                print(eve_img)
+                eve_img = eve_img[1]
+                image_path = eve_img.replace(re.match("https://(.*?)/", eve_img)[0], "")
+                temp_key = '/blogcache/img/' + hashlib.md5(image_path.encode("utf-8")).hexdigest()
+                temp_data = urllib.request.urlopen(eve_img, timeout=2).read()
+                response = client.put_object(
+                    Bucket=os.environ.get("website_bucket"),
+                    Body=temp_data,
+                    Key=temp_key,
+                )
+                content = content.replace(eve_img, baseUrl + temp_key)
+            except Exception as e:
+                print(e)
     return content
 
 
