@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="static/css/ie9.css"/><![endif]-->
     <!--[if lte IE 8]>
     <link rel="stylesheet" href="static/css/ie8.css"/><![endif]-->
+    <script type="text/javascript" src="env.js"></script>
     <style>
         img {
             max-width: 100%;
@@ -89,7 +90,7 @@
 
         SyntaxHighlighter.all() //执行代码高亮
 
-        var baseUrl = 'http://service-23ybmuq7-1256773370.sh.apigw.tencentcs.com/release'
+        var baseUrl = `http://${window.env.apiUrl}/release`
         var tagsUri = "/web/tags/list/get"
         var categoryListUri = "/web/category/list/get"
         var hotAritiListUri = "/web/article/list/hot/get"
