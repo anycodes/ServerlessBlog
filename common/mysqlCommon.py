@@ -18,25 +18,9 @@ class mysqlCommon:
         })
 
     def getDefaultPic(self):
-        return choice([
-            'http://t8.baidu.com/it/u=1484500186,1503043093&fm=79&app=86&f=JPEG?w=1280&h=853',
-            'http://t8.baidu.com/it/u=2247852322,986532796&fm=79&app=86&f=JPEG?w=1280&h=853',
-            'http://t7.baidu.com/it/u=3204887199,3790688592&fm=79&app=86&f=JPEG?w=4610&h=2968',
-            'http://t9.baidu.com/it/u=3363001160,1163944807&fm=79&app=86&f=JPEG?w=1280&h=830',
-            'http://t9.baidu.com/it/u=583874135,70653437&fm=79&app=86&f=JPEG?w=3607&h=2408',
-            'http://t9.baidu.com/it/u=583874135,70653437&fm=79&app=86&f=JPEG?w=3607&h=2408',
-            'http://t9.baidu.com/it/u=1307125826,3433407105&fm=79&app=86&f=JPEG?w=5760&h=3240',
-            'http://t9.baidu.com/it/u=2268908537,2815455140&fm=79&app=86&f=JPEG?w=1280&h=719',
-            'http://t7.baidu.com/it/u=1179872664,290201490&fm=79&app=86&f=JPEG?w=1280&h=854',
-            'http://t9.baidu.com/it/u=3949188917,63856583&fm=79&app=86&f=JPEG?w=1280&h=875',
-            'http://t9.baidu.com/it/u=2266751744,4253267866&fm=79&app=86&f=JPEG?w=1280&h=854',
-            'http://t8.baidu.com/it/u=4100756023,1345858297&fm=79&app=86&f=JPEG?w=1280&h=854',
-            'http://t7.baidu.com/it/u=1355385882,1155324943&fm=79&app=86&f=JPEG?w=1280&h=854',
-            'http://t9.baidu.com/it/u=2292037961,3689236171&fm=79&app=86&f=JPEG?w=1280&h=854',
-            'http://t9.baidu.com/it/u=4241966675,2405819829&fm=79&app=86&f=JPEG?w=1280&h=854',
-            'http://t8.baidu.com/it/u=2857883419,1187496708&fm=79&app=86&f=JPEG?w=1280&h=763',
-            'http://t8.baidu.com/it/u=198337120,441348595&fm=79&app=86&f=JPEG?w=1280&h=732'
-        ])
+        picList = ['https://serverless-blog-1256773370.cos.ap-shanghai.myqcloud.com/picture/%s.webp' % i for i in
+                   range(1, 26)]
+        return choice(picList)
 
     def getConnection(self, conf):
         self.connection = pymysql.connect(host=conf['host'],
@@ -113,7 +97,7 @@ class mysqlCommon:
                           "publish": str(eveArticle['publish']),
                           "picture": self.getPicture(eveArticle['content'])}
                          for eveArticle in result.fetchall()],
-                "count": self.doAction(count_stmt, count_data).fetchone()["COUNT(*)"]}
+                "count": int(self.doAction(count_stmt, count_data).fetchone()["COUNT(*)"]) + 1}
 
     def getHotArticleList(self):
         search_stmt = (
@@ -214,9 +198,8 @@ class mysqlCommon:
         return False if self.doAction(update_stmt, (wid)) == False else True
 
     def getPicture(self, content):
-        resultList =[eve[1] for eve in re.findall('<img(.*?)src="(.*?)"(.*?)>', content)]
+        resultList = [eve[1] for eve in re.findall('<img(.*?)src="(.*?)"(.*?)>', content)]
         return resultList[0] if resultList else self.getDefaultPic()
-
 
     def getTag(self, tag):
         search_stmt = (
