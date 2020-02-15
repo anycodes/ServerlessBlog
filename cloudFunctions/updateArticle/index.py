@@ -23,12 +23,11 @@ def main_handler(event, context):
         print(event)
 
         aid = event['id']
-
+        tagsList = [eve["id"] for eve in mysql.getTagsArticle(aid)]
         article = mysql.getArticleContent(aid)
         print(article)
         content = article["content"]
         pat = re.compile(r'[\u4e00-\u9fa5]+')
-
         h = html2text.HTML2Text()
         h.ignore_links = True
         content = "，".join(pat.findall(h.handle(content)))
@@ -38,7 +37,8 @@ def main_handler(event, context):
                 tid = mysql.getTag(eve)
                 if not tid:
                     tid = mysql.addTag(eve)
-                mysql.addArticleTag(aid, tid)
+                if tid not in tagsList:
+                    mysql.addArticleTag(aid, tid)
         return returnCommon.return_msg(False, "")
     except Exception as e:
         print(e)
