@@ -58,6 +58,8 @@ class mysqlCommon:
         return [{"id": eveCategory['cid'], "name": eveCategory['name']} for eveCategory in result.fetchall()]
 
     def getArticleList(self, category, tag, page=1):
+        startCount = 10 * (int(page) - 1) if page == 1 else 10 * (int(page) - 1) + 1
+        endCount = 10 * int(page) + 1
         if category:
             search_stmt = (
                 "SELECT article.*,category.name FROM `article` LEFT JOIN `category` ON article.category=category.cid WHERE article.category=%s ORDER BY -article.aid LIMIT %s,%s;"
@@ -65,7 +67,7 @@ class mysqlCommon:
             count_stmt = (
                 "SELECT COUNT(*) FROM `article` LEFT JOIN `category` ON article.category=category.cid WHERE article.category=%s;"
             )
-            data = (category, 10 * (int(page) - 1), 10 * int(page))
+            data = (category, startCount, endCount)
             count_data = (category,)
         elif tag:
             search_stmt = (
@@ -74,7 +76,7 @@ class mysqlCommon:
             count_stmt = (
                 "SELECT COUNT(*) FROM `article`LEFT JOIN `article_tags` ON article.aid=article_tags.aid WHERE article_tags.tid=%s;"
             )
-            data = (tag, 10 * (int(page) - 1), 10 * int(page))
+            data = (tag, startCount, endCount)
             count_data = (tag,)
         else:
             search_stmt = (
@@ -83,7 +85,7 @@ class mysqlCommon:
             count_stmt = (
                 "SELECT COUNT(*) FROM `article` LEFT JOIN `category` ON article.category=category.cid; "
             )
-            data = (10 * (int(page) - 1), 10 * int(page))
+            data = (startCount, endCount)
             count_data = ()
         result = self.doAction(search_stmt, data)
         if result == False:
@@ -97,7 +99,7 @@ class mysqlCommon:
                           "publish": str(eveArticle['publish']),
                           "picture": self.getPicture(eveArticle['content'])}
                          for eveArticle in result.fetchall()],
-                "count": int(self.doAction(count_stmt, count_data).fetchone()["COUNT(*)"]) + 1}
+                "count": int(self.doAction(count_stmt, count_data).fetchone()["COUNT(*)"])/10 + 1}
 
     def getHotArticleList(self):
         search_stmt = (
