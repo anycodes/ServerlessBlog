@@ -124,7 +124,7 @@
                             if (showArticles) {
                                 document.getElementById("more").innerHTML = `<header class="major"><h2>文章列表</h2></header><div class="posts">${showArticles}</div>`
                             }
-                            var pags = JSON.parse(xmlhttp.responseText)["message"]["count"] / 10
+                            var pags = JSON.parse(xmlhttp.responseText)["message"]["count"]
                             var thisPage = GetRequest().page || 1
                             var startPage = thisPage <= 5 ? 1 : thisPage - 5
                             var endPage = pags - thisPage <= 5 ? pags : thisPage + 5
