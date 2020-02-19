@@ -736,7 +736,55 @@ Conf:
     admin_user: mytest
     admin_password: mytest
 ```
+除了上面的内容，还要看一下域名问题(例如CosBucket)：
+```
+# 网站
+CosBucket:
+  component: '@serverless/tencent-website'
+  inputs:
+    code:
+      root: website/dist
+      src: ./
+      index: list.html
+    region:  ${Conf.region}
+    bucketName: ${Conf.website_bucket}
+    hosts:
+      - host: 0duzhan.com
+        https:
+          certId: awPsOIHY
+          forceSwitch: -1
+      - host: www.0duzhan.com
+        https:
+          certId: awPsOIHY
+          forceSwitch: -1
+
+    env:
+      apiUrl: ${APIService.subDomain}
+```
+以及API网关内容：
+```
+# 创建API网关Service
+APIService:
+  component: "@serverless/tencent-apigateway"
+  inputs:
+    region: ${Conf.region}
+    customDomain:
+      - domain: api.0duzhan.com
+        isDefaultMapping: 'FALSE'
+        pathMappingSet:
+          - path: /
+            environment: release
+        protocols:
+          - http
+    protocols:
+      - http
+      - https
+    ........
+```
+这两部分域名可以修改成自己的，或者删除掉这两个额key
+
 * 执行`init.py`:
+这里要注意，我是在MacOS下开发的，所以init.py应该可恶意在mac/linux运行，windows用户可能要适当修改一下。还有这里面需要一个依赖：pyyaml，需要自行安装一下。
 ```
 获取Yaml数据：  True
 建立数据库： True
