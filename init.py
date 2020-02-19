@@ -11,7 +11,7 @@ def setEnv():
         file_data = file.read()
         file.close()
 
-        data = yaml.load(file_data)
+        data = yaml.load(file_data, Loader=yaml.FullLoader)
         for eveKey, eveValue in data['Conf']['inputs'].items():
             os.environ[eveKey] = str(eveValue)
         return True
@@ -89,8 +89,8 @@ def initHTML():
             if not os.path.exists(temp[0]):
                 os.makedirs(temp[0])
             if eve.endswith(".html") or eve.endswith(".htm"):
-                with open(eve) as readData:
-                    with open(eve.replace(tempPath, tempDist), "w") as writeData:
+                with open(eve, encoding="utf-8") as readData:
+                    with open(eve.replace(tempPath, tempDist), "w", encoding="utf-8") as writeData:
                         writeData.write(readData.read().
                                         replace('{{ user }}', os.environ.get('blog_user')).
                                         replace('{{ email }}', os.environ.get('blog_email')).
