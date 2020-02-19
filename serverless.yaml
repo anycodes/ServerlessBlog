@@ -2,28 +2,28 @@
 Conf:
   component: "serverless-global"
   inputs:
-    region: ap-shanghai
+    region: ap-hongkong
     runtime: Python3.6
     handler: index.main_handler
     include_common: ./common
-    blog_user: Dfounder
+    blog_user: Anycodes
     blog_email: service@anycodes.cn
-    blog_about_me: 这就是我的博客
-    blog_host: blog.0duzhan.com
-    website_title: Serverless Blog System
-    website_keywords: Serverless, Serverless Framework, Tencent Cloud, SCF
-    website_description: 一款基于腾讯云Serverless架构，并且采用Serverless Framework构建的Serverless博客系统。
-    website_bucket:
-    mysql_host:
-    mysql_user:
-    mysql_password:
-    mysql_port:
-    mysql_db:
-    admin_user:
-    admin_password:
+    blog_about_me: 毕业于浙江大学，硕士学历，目前在腾讯工作，著有《Serverless 架构》一书，是Serverless架构的热衷者，曾做一款叫Anycodes的软件，目前下载超过80万次。
+    blog_host: www.0duzhan.com
+    website_title: 刘宇的博客
+    website_keywords: 刘宇的博客
+    website_description: 这是刘宇的个人博客：刘宇，毕业于浙江大学，硕士学历，目前在腾讯工作，著有《Serverless 架构》一书，是Serverless架构的热衷者，曾做一款叫Anycodes的软件，目前下载超过80万次。
+    website_bucket: serverless-blog-demo-1256773370
+    mysql_host: 
+    mysql_user: 
+    mysql_password: 
+    mysql_port: 
+    mysql_db: 
+    admin_user: serverless
+    admin_password: serverless
     tencent_secret_id:
     tencent_secret_key:
-    tencent_appid:
+    tencent_appid: 1256773370
 
 
 # 网站
@@ -36,6 +36,15 @@ CosBucket:
       index: list.html
     region:  ${Conf.region}
     bucketName: ${Conf.website_bucket}
+#     hosts:
+#       - host: 0duzhan.com
+#         https:
+#           certId: awPsOIHY
+#           forceSwitch: -1
+#       - host: www.0duzhan.com
+#         https:
+#           certId: awPsOIHY
+#           forceSwitch: -1
     env:
       apiUrl: ${APIService.subDomain}
 
@@ -215,7 +224,7 @@ Blog_Admin:
     runtime: ${Conf.runtime}
     region:  ${Conf.region}
     memorySize: 1024
-    timeout: 100
+    timeout: 300
     include:
       - ${Conf.include_common}
     environment:
@@ -255,11 +264,40 @@ Blog_Admin_updateArticle:
         mysql_db: ${Conf.mysql_db}
         region: ${Conf.region}
 
-# 创建API网关Servic
+Blog_Tools_uploadPicture:
+  component: '@serverless/tencent-scf'
+  inputs:
+    name: Blog_Tools_uploadPicture
+    description: 后台服务
+    codeUri: ./cloudFunctions/uploadPicture
+    handler: ${Conf.handler}
+    runtime: ${Conf.runtime}
+    region:  ${Conf.region}
+    memorySize: 1024
+    timeout: 300
+    include:
+      - ${Conf.include_common}
+    environment:
+      variables:
+        tencent_secret_id: ${Conf.tencent_secret_id}
+        tencent_secret_key: ${Conf.tencent_secret_key}
+        tencent_appid: ${Conf.tencent_appid}
+        region: ${Conf.region}
+        website_bucket: ${Conf.website_bucket}
+
+# 创建API网关Service
 APIService:
   component: "@serverless/tencent-apigateway"
   inputs:
     region: ${Conf.region}
+#     customDomain:
+#       - domain: api.0duzhan.com
+#         isDefaultMapping: 'FALSE'
+#         pathMappingSet:
+#           - path: /
+#             environment: release
+#         protocols:
+#           - http
     protocols:
       - http
       - https
@@ -323,6 +361,14 @@ APIService:
       - path: /admin
         description: 后台服务
         method: ANY
+        serviceTimeout: 300
         function:
           functionName: Blog_Admin
           isIntegratedResponse: TRUE
+      - path: /tools/picture/upload
+        description: 上传图片
+        method: POST
+        serviceTimeout: 300
+        enableCORS: TRUE
+        function:
+          functionName: Blog_Tools_uploadPicture
