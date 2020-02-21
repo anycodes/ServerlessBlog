@@ -1,37 +1,49 @@
 # -*- coding: utf8 -*-
 
-import json
+import json, os, hashlib, cgi
+import os, base64
+from qcloud_cos import CosConfig
+from qcloud_cos import CosS3Client
+from qcloud_cos import CosServiceError
+from qcloud_cos import CosClientError
 
 try:
     import returnCommon
-    from mysqlCommon import mysqlCommon
 except:
     import common.testCommon
 
     common.testCommon.setEnv()
 
     import common.returnCommon as returnCommon
-    from common.mysqlCommon import mysqlCommon
 
-
-mysql = mysqlCommon()
+secret_id = os.environ.get("tencent_secret_id")
+secret_key = os.environ.get("tencent_secret_key")
+region = os.environ.get("region")
+config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key)
+client = CosS3Client(config)
 
 
 def main_handler(event, context):
     try:
-        body = json.loads(event['body'])
-        aid = body['id']
-
-        if not aid:
-            return returnCommon.return_msg(True, "参数异常，请重新发起请求")
-
-        result = mysql.getArticleContent(aid)
-        if result:
-            return returnCommon.return_msg(False, result)
-        return returnCommon.return_msg(True, "未获得到相关数据")
+        pictureBase64 = event["body"].split("base64,")[1]
+        key = hashlib.md5(pictureBase64.encode("utf-8")).hexdigest()
+        tempKey = '/blogcache/img/' + key
+        with open('/tmp/%s' % key, 'wb') as f:
+            f.write(base64.b64decode(pictureBase64))
+        response = client.upload_file(
+            Bucket=os.environ.get("website_bucket"),
+            LocalFilePath='/tmp/%s' % key,
+            Key=tempKey,
+        )
+        return {
+            "uploaded": 1,
+            "url": 'https://%s.cos.%s.myqcloud.com' % (
+            os.environ.get("website_bucket"), os.environ.get("region")) + tempKey
+        }
     except Exception as e:
         print(e)
-    return returnCommon.return_msg(True, "数据异常，请联系管理员处理")
+    return {"uploaded": 0, "error": {"message": "数据异常，请联系管理员处理"}}
+
 
 def test():
     event = {

@@ -8,3 +8,4 @@ werkzeug==0.16.0
 Flask-WTF==0.14.3
 WTForms==2.2.1
 wtf==0.1
+cos-python-sdk-v5==1.7.7
