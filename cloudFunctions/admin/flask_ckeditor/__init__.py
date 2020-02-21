@@ -41,7 +41,7 @@ class _CKEditor(object):
             url = url_for('ckeditor.static', filename='%s/ckeditor.js' % pkg_type)
         else:
             url = '//cdn.ckeditor.com/%s/%s/ckeditor.js' % (version, pkg_type)
-            url = "//serverless-blog-1256773370.cos.ap-shanghai.myqcloud.com/ckeditor/static/standard/ckeditor.js"
+            # url = "//serverless-blog-1256773370.cos.ap-shanghai.myqcloud.com/ckeditor/static/standard/ckeditor.js"
 
         if custom_url:
             url = custom_url

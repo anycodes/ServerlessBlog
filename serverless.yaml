@@ -264,26 +264,26 @@ Blog_Admin_updateArticle:
         mysql_db: ${Conf.mysql_db}
         region: ${Conf.region}
 
-Blog_Tools_uploadPicture:
-  component: '@serverless/tencent-scf'
-  inputs:
-    name: Blog_Tools_uploadPicture
-    description: 后台服务
-    codeUri: ./cloudFunctions/uploadPicture
-    handler: ${Conf.handler}
-    runtime: ${Conf.runtime}
-    region:  ${Conf.region}
-    memorySize: 1024
-    timeout: 300
-    include:
-      - ${Conf.include_common}
-    environment:
-      variables:
-        tencent_secret_id: ${Conf.tencent_secret_id}
-        tencent_secret_key: ${Conf.tencent_secret_key}
-        tencent_appid: ${Conf.tencent_appid}
-        region: ${Conf.region}
-        website_bucket: ${Conf.website_bucket}
+#Blog_Tools_uploadPicture:
+#  component: '@serverless/tencent-scf'
+#  inputs:
+#    name: Blog_Tools_uploadPicture
+#    description: 后台服务
+#    codeUri: ./cloudFunctions/uploadPicture
+#    handler: ${Conf.handler}
+#    runtime: ${Conf.runtime}
+#    region:  ${Conf.region}
+#    memorySize: 1024
+#    timeout: 300
+#    include:
+#      - ${Conf.include_common}
+#    environment:
+#      variables:
+#        tencent_secret_id: ${Conf.tencent_secret_id}
+#        tencent_secret_key: ${Conf.tencent_secret_key}
+#        tencent_appid: ${Conf.tencent_appid}
+#        region: ${Conf.region}
+#        website_bucket: ${Conf.website_bucket}
 
 # 创建API网关Service
 APIService:
@@ -365,10 +365,10 @@ APIService:
         function:
           functionName: Blog_Admin
           isIntegratedResponse: TRUE
-      - path: /tools/picture/upload
-        description: 上传图片
-        method: POST
-        serviceTimeout: 300
-        enableCORS: TRUE
-        function:
-          functionName: Blog_Tools_uploadPicture
+#      - path: /tools/picture/upload
+#        description: 上传图片
+#        method: POST
+#        serviceTimeout: 300
+#        enableCORS: TRUE
+#        function:
+#          functionName: Blog_Tools_uploadPicture
