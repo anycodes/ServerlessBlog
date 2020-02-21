@@ -108,6 +108,6 @@ def initHTML():
 
 if __name__ == "__main__":
     print("获取Yaml数据： ", setEnv())
-    # print("建立数据库：", initDb())
-    # print("建立数据库：", initTable())
+    print("建立数据库：", initDb())
+    print("建立数据库：", initTable())
     print("初始化HTML：", initHTML())
