@@ -223,7 +223,7 @@ Blog_Admin:
     handler: ${Conf.handler}
     runtime: ${Conf.runtime}
     region:  ${Conf.region}
-    memorySize: 1024
+    memorySize: 512
     timeout: 300
     include:
       - ${Conf.include_common}
@@ -251,7 +251,7 @@ Blog_Admin_updateArticle:
     handler: ${Conf.handler}
     runtime: ${Conf.runtime}
     region:  ${Conf.region}
-    memorySize: 512
+    memorySize: 256
     timeout: 100
     include:
       - ${Conf.include_common}
