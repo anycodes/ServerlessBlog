@@ -1,4 +1,4 @@
-Flask==1.1.1
+Flask==2.3.2
 flask_sqlalchemy==2.4.1
 html2text==2020.1.16
 snownlp==0.12.3
